@@ -7,7 +7,11 @@ import {
 
 const router = express.Router();
 
-router.post("/register", RegisterController);
+// ⚠️ SECURITY: Registration endpoint disabled for production
+// Admin accounts should be created via database seeder or secure admin panel
+// To enable for development, uncomment the line below:
+// router.post("/register", RegisterController);
+
 router.post("/login", LoginController);
 router.post("/logout", LogoutController);
 

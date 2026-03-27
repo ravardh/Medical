@@ -2,8 +2,8 @@ import nodemailer from "nodemailer";
 
 // Professional welcome email template
 export const sendWelcomeEmail = async (userDetails) => {
-  const { name, email, password } = userDetails;
-  
+  const { name, email } = userDetails;
+
   try {
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -24,16 +24,16 @@ We are delighted to welcome you to the Medi-Tech Remedies family! Your account h
 
 Division of Alvin Willcure Labs Pvt Ltd.
 
-Your Login Credentials:
+Your Account Information:
 Email: ${email}
-Temporary Password: ${password}
 
-Important: Please change your password after your first login for security purposes.
+Your login password will be provided to you separately by your administrator for security purposes.
 
 Getting Started:
-1. Visit our portal and log in with your credentials
-2. Start submitting your daily call reports
-3. Track your activities and performance
+1. Wait for your administrator to provide your login password
+2. Visit our portal and log in with your credentials
+3. Start submitting your daily call reports
+4. Track your activities and performance
 
 If you have any questions or need assistance, please don't hesitate to reach out to your administrator.
 
@@ -240,21 +240,17 @@ Division of Alvin Willcure Labs Pvt Ltd.
 
       <!-- Credentials Box -->
       <div class="credentials-box">
-        <div class="credentials-title">Your Login Credentials</div>
+        <div class="credentials-title">Your Login Information</div>
         <div class="credential-item">
           <span class="credential-label">Email Address:</span>
           <span class="credential-value">${email}</span>
-        </div>
-        <div class="credential-item">
-          <span class="credential-label">Temporary Password:</span>
-          <span class="credential-value">${password}</span>
         </div>
       </div>
 
       <!-- Security Notice -->
       <div class="security-notice">
-        <strong>Security Notice:</strong> This is a temporary password for your first login. For security purposes, 
-        please keep these credentials confidential and do not share them with anyone.
+        <strong>Important:</strong> Your login password will be provided to you separately by your administrator for security purposes.
+        Please contact your administrator if you have not received your password.
       </div>
 
       <!-- Getting Started Steps -->
@@ -266,7 +262,7 @@ Division of Alvin Willcure Labs Pvt Ltd.
               <div style="background:#325946;color:#fff;width:40px;height:40px;border-radius:50%;border:2px solid #a1cc59;display:table-cell;vertical-align:middle;text-align:center;font-size:20px;font-weight:700;line-height:40px;">1</div>
             </td>
             <td style="padding-left:10px;font-size:16px;color:#1e293b;vertical-align:middle;line-height:1.6;">
-              Access the employee portal and log in using your credentials provided above
+              Wait for your administrator to provide your login password securely
             </td>
           </tr>
           <tr><td height="18"></td></tr>
@@ -275,13 +271,22 @@ Division of Alvin Willcure Labs Pvt Ltd.
               <div style="background:#325946;color:#fff;width:40px;height:40px;border-radius:50%;border:2px solid #a1cc59;display:table-cell;vertical-align:middle;text-align:center;font-size:20px;font-weight:700;line-height:40px;">2</div>
             </td>
             <td style="padding-left:10px;font-size:16px;color:#1e293b;vertical-align:middle;line-height:1.6;">
-              Complete your profile information and review company policies
+              Access the employee portal and log in using your email and provided password
             </td>
           </tr>
           <tr><td height="18"></td></tr>
           <tr>
             <td width="60" align="center" valign="middle" style="vertical-align:middle;">
               <div style="background:#325946;color:#fff;width:40px;height:40px;border-radius:50%;border:2px solid #a1cc59;display:table-cell;vertical-align:middle;text-align:center;font-size:20px;font-weight:700;line-height:40px;">3</div>
+            </td>
+            <td style="padding-left:10px;font-size:16px;color:#1e293b;vertical-align:middle;line-height:1.6;">
+              Complete your profile information and review company policies
+            </td>
+          </tr>
+          <tr><td height="18"></td></tr>
+          <tr>
+            <td width="60" align="center" valign="middle" style="vertical-align:middle;">
+              <div style="background:#325946;color:#fff;width:40px;height:40px;border-radius:50%;border:2px solid #a1cc59;display:table-cell;vertical-align:middle;text-align:center;font-size:20px;font-weight:700;line-height:40px;">4</div>
             </td>
             <td style="padding-left:10px;font-size:16px;color:#1e293b;vertical-align:middle;line-height:1.6;">
               Begin submitting your daily call reports and tracking your activities

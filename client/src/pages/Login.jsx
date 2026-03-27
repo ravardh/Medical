@@ -24,20 +24,15 @@ const Login = () => {
     try {
       const response = await axios.post("/auth/login", formData);
       if (response.data) {
-        console.log("Login response:", response.data);
-        
         // Update auth context
         login(response.data.token, response.data);
-        
+
         // Redirect based on user role
         const userRole = response.data.user?.role;
-        console.log("User role:", userRole);
-        
+
         if (userRole === "admin") {
-          console.log("Redirecting to admin dashboard");
           navigate("/dashboard");
         } else {
-          console.log("Redirecting to employee dashboard");
           navigate("/employee-dashboard");
         }
       }

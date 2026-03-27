@@ -250,8 +250,6 @@ const AddSalarySlipModal = ({ isOpen, onClose, onSlipCreated }) => {
       ),
     };
 
-    console.log("Submitting salary slip data:", submissionData);
-
     try {
       setLoading(true);
       await axios.post("/admin/salary-slips", submissionData, {

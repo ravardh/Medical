@@ -66,7 +66,12 @@ import multer from "multer";
 
 const router = express.Router();
 
-const upload = multer();
+const upload = multer({
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit per file
+    files: 10 // Maximum 10 files for product images
+  }
+});
 
 // Dashboard Stats Route
 router.get("/stats", verifyAdminToken, getStats);

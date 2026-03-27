@@ -14,13 +14,8 @@ export const verifyAdminToken = (req, res, next) => {
   //console.log("🔑 Extracted token:", token ? "Token exists" : "No token found");
   
   if (!token) {
-    return res.status(401).json({ 
-      message: "Not authorized, token missing", 
-      debug: {
-        cookies: req.cookies,
-        authHeader: req.headers.authorization,
-        environment: process.env.NODE_ENV
-      }
+    return res.status(401).json({
+      message: "Not authorized, token missing"
     });
   }
 

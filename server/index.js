@@ -12,6 +12,7 @@ import connectDB from "./src/config/db.js";
 import cookieParser from "cookie-parser";
 import getCloudinary from "./src/config/cloudinary.js";
 import { scheduleCleanup } from "./src/utils/cleanupOldRequests.js";
+import { scheduleBirthdayReminders } from "./src/utils/sendBirthdayReminder.js";
 
 const app = express();
 
@@ -28,7 +29,7 @@ app.use(
   })
 );
 
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
 app.use(morgan("dev"));
 
@@ -43,8 +44,7 @@ app.use("/mr", mrRouter);
 app.get("/", (req, res) => {
   res.json({
     message: "Server Connected",
-    CloudName: process.env.CLOUDINARY_CLOUD_NAME,
-    Email: process.env.MAIL_USER,
+    status: "OK"
   });
 });
 
@@ -90,4 +90,8 @@ app.listen(PORT, () => {
   // Start automatic cleanup of old extension requests
   scheduleCleanup();
   console.log("✅ Automatic cleanup scheduler started (runs every 24 hours)");
+
+  // Start birthday reminder scheduler
+  scheduleBirthdayReminders();
+
 });

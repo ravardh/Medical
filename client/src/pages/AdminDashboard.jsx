@@ -110,25 +110,18 @@ const AdminDashboard = () => {
     // Check if admin token exists in local storage
     const adminToken = localStorage.getItem("adminToken");
     const adminInfo = JSON.parse(localStorage.getItem("adminInfo"));
-    
-    console.log("AdminDashboard - Token:", adminToken);
-    console.log("AdminDashboard - Info:", adminInfo);
-    console.log("AdminDashboard - Role:", adminInfo?.user?.role);
-    
+
     if (!adminToken) {
-      console.log("No token, redirecting to login");
       navigate("/login");
       return;
     }
-    
+
     // Check if user is admin
     if (adminInfo?.user?.role !== "admin") {
-      console.log("Not admin role, redirecting to employee dashboard");
       navigate("/employee-dashboard");
       return;
     }
-    
-    console.log("Admin verified, fetching stats");
+
     fetchStats();
     fetchPendingRequestsCount();
     fetchPendingLeavesCount();

@@ -22,7 +22,7 @@ export const createContact = async (req, res) => {
 
     // ✉️ Send Email to Admin
     await sendMail(
-      "alvinwillcure@gmail.com", // Replace with your email
+      process.env.ADMIN_MAIL,
       `New Contact Request: ${subject}`, // Updated subject line
       `
             

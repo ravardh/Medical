@@ -39,25 +39,18 @@ const EmployeeDashboard = () => {
       try {
         const token = localStorage.getItem("adminToken");
         const userInfo = JSON.parse(localStorage.getItem("adminInfo"));
-        
-        console.log("EmployeeDashboard - Token:", token);
-        console.log("EmployeeDashboard - Info:", userInfo);
-        console.log("EmployeeDashboard - Role:", userInfo?.user?.role);
-        
+
         if (!token) {
-          console.log("No token, redirecting to login");
           navigate("/login");
           return;
         }
 
         // Check if user is not admin
         if (userInfo?.user?.role === "admin") {
-          console.log("Is admin, redirecting to admin dashboard");
           navigate("/dashboard");
           return;
         }
 
-        console.log("Employee verified, setting info");
         setEmployeeInfo(userInfo?.user);
         setLoading(false);
       } catch (error) {

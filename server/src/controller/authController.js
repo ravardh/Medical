@@ -41,15 +41,7 @@ export const LoginController = async (req, res, next) => {
 
     // Generate a JWT token
     const token = genToken(res, user._id);
-    console.log("User logged in successfully:", user.email);
-    console.log("User role:", user.role);
-    console.log("User data being sent:", {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-    });
-    
+
     res.status(200).json({
       user: {
         id: user._id,
