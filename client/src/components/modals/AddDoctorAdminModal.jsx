@@ -40,13 +40,15 @@ const MP_PLACES = [
   "Dhar",
 ].sort();
 
-const AddDoctorAdminModal = ({ isOpen, onClose, onSuccess }) => {
+const AddDoctorAdminModal = ({ isOpen, onClose, onSuccess, isEmployee = false }) => {
   const [formData, setFormData] = useState({
     name: "",
     clinicName: "",
     place: "",
+    area: "",
     birthdate: "",
     phone: "",
+    phone2: "",
     email: "",
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -79,7 +81,12 @@ const AddDoctorAdminModal = ({ isOpen, onClose, onSuccess }) => {
       return;
     }
     if (formData.phone && !phoneRegex.test(formData.phone)) {
-      toast.error("Enter a valid phone number (7-15 digits, optional +)");
+      toast.error("Enter a valid phone number 1 (7-15 digits, optional +)");
+      setIsLoading(false);
+      return;
+    }
+    if (formData.phone2 && !phoneRegex.test(formData.phone2)) {
+      toast.error("Enter a valid phone number 2 (7-15 digits, optional +)");
       setIsLoading(false);
       return;
     }
@@ -90,18 +97,22 @@ const AddDoctorAdminModal = ({ isOpen, onClose, onSuccess }) => {
     }
 
     try {
-      await axios.post("/admin/doctors", formData, {
+      // Use /mr/doctors for employees, /admin/doctors for admins
+      const endpoint = isEmployee ? "/mr/doctors" : "/admin/doctors";
+      await axios.post(endpoint, formData, {
         withCredentials: true,
       });
-      toast.success("Doctor added successfully by Admin");
+      toast.success(`Doctor added successfully by ${isEmployee ? 'Employee' : 'Admin'}`);
       onSuccess();
       // Reset form
       setFormData({
         name: "",
         clinicName: "",
         place: "",
+        area: "",
         birthdate: "",
         phone: "",
+        phone2: "",
         email: "",
       });
     } catch (error) {
@@ -188,11 +199,26 @@ const AddDoctorAdminModal = ({ isOpen, onClose, onSuccess }) => {
               />
             </div>
 
+            {/* Area */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Area
+              </label>
+              <input
+                type="text"
+                name="area"
+                value={formData.area}
+                onChange={handleInputChange}
+                className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                placeholder="Enter area/locality"
+              />
+            </div>
+
             {/* Birthdate */}
-                        {/* Phone (optional) */}
+                        {/* Phone No. 1 (optional) */}
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Phone Number (Optional)
+                            Phone No. 1 (Optional)
                           </label>
                           <input
                             type="text"
@@ -200,7 +226,21 @@ const AddDoctorAdminModal = ({ isOpen, onClose, onSuccess }) => {
                             value={formData.phone}
                             onChange={handleInputChange}
                             className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                            placeholder="Enter phone number"
+                            placeholder="Enter phone number 1"
+                          />
+                        </div>
+                        {/* Phone No. 2 (optional) */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Phone No. 2 (Optional)
+                          </label>
+                          <input
+                            type="text"
+                            name="phone2"
+                            value={formData.phone2}
+                            onChange={handleInputChange}
+                            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                            placeholder="Enter phone number 2"
                           />
                         </div>
                         {/* Email (optional) */}

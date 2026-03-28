@@ -67,12 +67,20 @@ const ExpenseAdminContent = () => {
       filtered = filtered.filter(exp => exp.year === parseInt(filters.year));
     }
     if (filters.employee) {
-      filtered = filtered.filter(exp => 
+      filtered = filtered.filter(exp =>
         exp.employee?.name.toLowerCase().includes(filters.employee.toLowerCase()) ||
         exp.employee?.email.toLowerCase().includes(filters.employee.toLowerCase()) ||
         exp.employee?.employeeId?.toLowerCase().includes(filters.employee.toLowerCase())
       );
     }
+
+    // Sort by newest first (using multiple date fields for better coverage)
+    filtered.sort((a, b) => {
+      // Priority: dateOfPosting (submission date) > updatedAt > createdAt
+      const dateA = new Date(a.dateOfPosting || a.updatedAt || a.createdAt);
+      const dateB = new Date(b.dateOfPosting || b.updatedAt || b.createdAt);
+      return dateB - dateA; // Newest first (descending order)
+    });
 
     setFilteredExpenses(filtered);
   };
@@ -94,12 +102,17 @@ const ExpenseAdminContent = () => {
 
   const handleEntryChange = (index, field, value) => {
     const newExpense = { ...selectedExpense };
-    
+
     if (field.includes(".")) {
       const [parent, child] = field.split(".");
       newExpense.entries[index][parent][child] = parseFloat(value) || 0;
     } else {
-      newExpense.entries[index][field] = field === "place" || field === "remark" ? value : parseFloat(value) || 0;
+      if (field === "place" || field === "remark") {
+        newExpense.entries[index][field] = value;
+      } else {
+        // Handle numeric fields (fare, otherExpenses, etc.)
+        newExpense.entries[index][field] = parseFloat(value) || 0;
+      }
     }
 
     recalculate(newExpense);
@@ -108,6 +121,7 @@ const ExpenseAdminContent = () => {
 
   const recalculate = (expenseData) => {
     const totals = {
+      fare: 0,
       hq: 0,
       ex: 0,
       os: 0,
@@ -125,6 +139,7 @@ const ExpenseAdminContent = () => {
     };
 
     expenseData.entries.forEach((entry) => {
+      totals.fare += entry.fare || 0;
       totals.hq += entry.dailyAllowance?.hq || 0;
       totals.ex += entry.dailyAllowance?.ex || 0;
       totals.os += entry.dailyAllowance?.os || 0;
@@ -141,7 +156,7 @@ const ExpenseAdminContent = () => {
       }
     });
 
-    totals.grandTotal = totals.hq + totals.ex + totals.os + totals.otherExpenses;
+    totals.grandTotal = totals.fare + totals.hq + totals.ex + totals.os + totals.otherExpenses;
 
     expenseData.totals = totals;
     expenseData.summary = summary;

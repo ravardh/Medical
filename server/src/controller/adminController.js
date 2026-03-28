@@ -719,7 +719,7 @@ export const getAllDailyCalls = async (req, res) => {
   try {
     const dailyCalls = await DailyCall.find()
       .populate("mr", "name email")
-      .populate("doctor", "name clinicName place")
+      .populate("doctor", "name clinicName place area")
       .populate("products", "productName brandName")
       .sort({ date: -1 }); // Newest first
 
@@ -747,7 +747,7 @@ export const getAllDoctors = async (req, res) => {
 // Add doctor (Admin)
 export const addDoctor = async (req, res) => {
   try {
-    const { name, clinicName, place, birthdate, phone, email } = req.body;
+    const { name, clinicName, place, area, birthdate, phone, phone2, email } = req.body;
 
     if (!name) {
       return res.status(400).json({ message: "Name is required" });
@@ -757,8 +757,10 @@ export const addDoctor = async (req, res) => {
       name,
       clinicName,
       place,
+      area,
       birthdate: birthdate || null,
       phone: phone || '',
+      phone2: phone2 || '',
       email: email || '',
       createdBy: req.admin.id, // Use admin's ID
     });
@@ -768,7 +770,7 @@ export const addDoctor = async (req, res) => {
       "createdBy",
       "name email"
     );
-    
+
     res.status(201).json(populatedDoctor);
   } catch (error) {
     console.error("Error adding doctor:", error);
@@ -782,6 +784,7 @@ export const updateDoctor = async (req, res) => {
     const { id } = req.params;
     const updateData = { ...req.body };
     if (typeof updateData.phone === 'undefined') updateData.phone = '';
+    if (typeof updateData.phone2 === 'undefined') updateData.phone2 = '';
     if (typeof updateData.email === 'undefined') updateData.email = '';
     const updatedDoctor = await Doctor.findByIdAndUpdate(id, updateData, { new: true }).populate("createdBy", "name");
     if (!updatedDoctor) {

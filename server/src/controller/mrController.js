@@ -10,7 +10,7 @@ import { sendLeaveApplicationEmail } from "../utils/sendLeaveEmail.js";
 // Add a new doctor
 export const addDoctor = async (req, res) => {
   try {
-    const { name, clinicName, place, birthdate } = req.body;
+    const { name, clinicName, place, area, birthdate, phone, phone2, email } = req.body;
 
     if (!name) {
       return res.status(400).json({ message: "Doctor name is required" });
@@ -20,7 +20,11 @@ export const addDoctor = async (req, res) => {
       name,
       clinicName,
       place,
+      area,
       birthdate: birthdate ? new Date(birthdate) : null,
+      phone: phone || '',
+      phone2: phone2 || '',
+      email: email || '',
       createdBy: req.user._id, // MR's ID from JWT
     });
 
@@ -42,7 +46,7 @@ export const getAllDoctors = async (req, res) => {
     const doctors = await Doctor.find()
       .populate("createdBy", "name email")
       .sort({ createdAt: -1 })
-      .select("name clinicName place birthdate createdBy");
+      .select("name clinicName place area birthdate phone phone2 email createdBy");
 
     res.json(doctors);
   } catch (error) {
@@ -51,24 +55,28 @@ export const getAllDoctors = async (req, res) => {
   }
 };
 
-// Update doctor
+// Update doctor - employees can edit any doctor (same rights as admin)
 export const updateDoctor = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, clinicName, place, birthdate } = req.body;
+    const { name, clinicName, place, area, birthdate, phone, phone2, email } = req.body;
 
-    // Find doctor and verify ownership
-    const doctor = await Doctor.findOne({ _id: id, createdBy: req.user._id });
+    // Find doctor by ID (no ownership restriction)
+    const doctor = await Doctor.findById(id);
 
     if (!doctor) {
-      return res.status(404).json({ message: "Doctor not found or unauthorized" });
+      return res.status(404).json({ message: "Doctor not found" });
     }
 
     // Update fields
     if (name) doctor.name = name;
     if (clinicName !== undefined) doctor.clinicName = clinicName;
     if (place !== undefined) doctor.place = place;
+    if (area !== undefined) doctor.area = area;
     if (birthdate !== undefined) doctor.birthdate = birthdate ? new Date(birthdate) : null;
+    if (phone !== undefined) doctor.phone = phone || '';
+    if (phone2 !== undefined) doctor.phone2 = phone2 || '';
+    if (email !== undefined) doctor.email = email || '';
 
     await doctor.save();
 
@@ -167,7 +175,7 @@ export const submitDailyCall = async (req, res) => {
     await newDailyCall.save();
 
     // Populate doctor and products details for response
-    await newDailyCall.populate("doctor", "name clinicName place");
+    await newDailyCall.populate("doctor", "name clinicName place area");
     await newDailyCall.populate("products", "productName brandName");
 
     res.status(201).json({

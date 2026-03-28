@@ -42,7 +42,8 @@ const DoctorsContent = ({ isEmployee = false }) => {
       doctor.name.toLowerCase().includes(search.toLowerCase()) ||
       (doctor.clinicName && doctor.clinicName.toLowerCase().includes(search.toLowerCase())) ||
       (doctor.place && doctor.place.toLowerCase().includes(search.toLowerCase())) ||
-      (doctor.city && doctor.city.toLowerCase().includes(search.toLowerCase()))
+      (doctor.city && doctor.city.toLowerCase().includes(search.toLowerCase())) ||
+      (doctor.area && doctor.area.toLowerCase().includes(search.toLowerCase()))
   );
 
   const handleEdit = (doctor) => {
@@ -120,16 +121,14 @@ const DoctorsContent = ({ isEmployee = false }) => {
                       )}
                     </div>
                   </div>
-                  {/* Only show edit button for admin */}
-                  {!isEmployee && (
-                    <button
-                      onClick={() => handleEdit(doctor)}
-                      className="text-cyan-600 hover:text-cyan-800 p-2 rounded-full hover:bg-cyan-50 transition-colors"
-                      title="Edit Doctor"
-                    >
-                      <FiEdit size={18} />
-                    </button>
-                  )}
+                  {/* Show edit button for both admin and employee */}
+                  <button
+                    onClick={() => handleEdit(doctor)}
+                    className="text-cyan-600 hover:text-cyan-800 p-2 rounded-full hover:bg-cyan-50 transition-colors"
+                    title="Edit Doctor"
+                  >
+                    <FiEdit size={18} />
+                  </button>
                 </div>
                 
                 {doctor.clinicName && (
@@ -138,10 +137,10 @@ const DoctorsContent = ({ isEmployee = false }) => {
                   </div>
                 )}
                 
-                {(doctor.place || doctor.city) && (
+                {(doctor.place || doctor.city || doctor.area) && (
                   <div className="flex items-center text-sm text-gray-600 mb-2">
                     <FiMapPin size={14} className="mr-1" />
-                    {doctor.place || doctor.city}
+                    {doctor.place || doctor.city}{doctor.area ? `, ${doctor.area}` : ''}
                   </div>
                 )}
 
@@ -162,6 +161,7 @@ const DoctorsContent = ({ isEmployee = false }) => {
       {isAddDoctorModalOpen && (
         <AddDoctorAdminModal
           isOpen={isAddDoctorModalOpen}
+          isEmployee={isEmployee}
           onClose={() => setIsAddDoctorModalOpen(false)}
           onSuccess={() => {
             fetchDoctors();
@@ -170,7 +170,7 @@ const DoctorsContent = ({ isEmployee = false }) => {
         />
       )}
 
-      {isEditDoctorModalOpen && !isEmployee && (
+      {isEditDoctorModalOpen && (
         <EditDoctorModal
           isOpen={isEditDoctorModalOpen}
           isEmployee={isEmployee}

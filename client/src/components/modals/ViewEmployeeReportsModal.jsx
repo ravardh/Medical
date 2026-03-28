@@ -91,8 +91,10 @@ const ViewEmployeeReportsModal = ({ isOpen, onClose, employee }) => {
       const searchLower = search.toLowerCase();
       const matchesSearch =
         report.doctor?.name?.toLowerCase().includes(searchLower) ||
-        report.doctor?.city?.toLowerCase().includes(searchLower) ||
         report.doctor?.clinicName?.toLowerCase().includes(searchLower) ||
+        report.doctor?.place?.toLowerCase().includes(searchLower) ||
+        report.doctor?.city?.toLowerCase().includes(searchLower) ||
+        report.doctor?.area?.toLowerCase().includes(searchLower) ||
         report.remarks?.toLowerCase().includes(searchLower);
 
       // Date filtering
@@ -156,7 +158,8 @@ const ViewEmployeeReportsModal = ({ isOpen, onClose, employee }) => {
         'Visit Date': formatDate(report.date),
         'Doctor Name': `Dr. ${report.doctor?.name || 'N/A'}`,
         'Clinic Name': report.doctor?.clinicName || '-',
-        'City': report.doctor?.city || '-',
+        'Place': report.doctor?.place || report.doctor?.city || '-',
+        'Area': report.doctor?.area || '-',
         'Products': report.products && report.products.length > 0
           ? report.products.map(p => p.productName || p.name).join(', ')
           : '-',
@@ -172,7 +175,8 @@ const ViewEmployeeReportsModal = ({ isOpen, onClose, employee }) => {
         { wch: 15 }, // Visit Date
         { wch: 25 }, // Doctor Name
         { wch: 25 }, // Clinic Name
-        { wch: 15 }, // City
+        { wch: 15 }, // Place
+        { wch: 20 }, // Area
         { wch: 40 }, // Products
         { wch: 40 }, // Remarks
         { wch: 20 }, // Submitted On
@@ -326,17 +330,16 @@ const ViewEmployeeReportsModal = ({ isOpen, onClose, employee }) => {
                     </div>
 
                     {/* Clinic and Location */}
-                    {(report.doctor?.clinicName || report.doctor?.city) && (
+                    {(report.doctor?.clinicName || report.doctor?.place || report.doctor?.city || report.doctor?.area) && (
                       <div className="text-xs text-gray-600 mb-2">
-                        {report.doctor?.clinicName && (
-                          <div className="font-medium">{report.doctor.clinicName}</div>
-                        )}
-                        {report.doctor?.city && (
-                          <div className="flex items-center text-gray-500 mt-0.5">
-                            <FiMapPin size={10} className="mr-1" />
-                            {report.doctor.place || report.doctor.city}
-                          </div>
-                        )}
+                        <div className="flex items-center text-gray-500">
+                          <FiMapPin size={10} className="mr-1" />
+                          {report.doctor?.clinicName && <span>{report.doctor.clinicName}</span>}
+                          {report.doctor?.clinicName && (report.doctor?.place || report.doctor?.city) && <span> • </span>}
+                          {(report.doctor?.place || report.doctor?.city) && <span>{report.doctor.place || report.doctor.city}</span>}
+                          {report.doctor?.area && (report.doctor?.place || report.doctor?.city) && <span> • </span>}
+                          {report.doctor?.area && <span>{report.doctor.area}</span>}
+                        </div>
                       </div>
                     )}
 
@@ -423,22 +426,19 @@ const ViewEmployeeReportsModal = ({ isOpen, onClose, employee }) => {
                         <div className="text-xs font-semibold text-gray-900">
                           Dr. {report.doctor?.name || "N/A"}
                         </div>
-                        {report.doctor?.clinicName && (
+                        {(report.doctor?.clinicName || report.doctor?.place || report.doctor?.city || report.doctor?.area) && (
                           <div className="text-xs text-gray-500 mt-0.5">
-                            {report.doctor.clinicName}
+                            {report.doctor?.clinicName && <span>{report.doctor.clinicName}</span>}
+                            {report.doctor?.clinicName && (report.doctor?.place || report.doctor?.city) && <span> • </span>}
+                            {(report.doctor?.place || report.doctor?.city) && <span>{report.doctor.place || report.doctor.city}</span>}
+                            {report.doctor?.area && (report.doctor?.place || report.doctor?.city) && <span> • </span>}
+                            {report.doctor?.area && <span>{report.doctor.area}</span>}
                           </div>
                         )}
                       </td>
                       <td className="px-4 py-3">
                         <div className="text-xs text-gray-600">
-                          {(report.doctor?.place || report.doctor?.city) ? (
-                            <div className="flex items-center">
-                              <FiMapPin size={10} className="mr-1" />
-                              {report.doctor.place || report.doctor.city}
-                            </div>
-                          ) : (
-                            "-"
-                          )}
+                          -
                         </div>
                       </td>
                       <td className="px-4 py-3">

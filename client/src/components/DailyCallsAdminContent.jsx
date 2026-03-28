@@ -38,7 +38,10 @@ const DailyCallsAdminContent = () => {
     const matchesSearch =
       call.mr?.name?.toLowerCase().includes(searchLower) ||
       call.doctor?.name?.toLowerCase().includes(searchLower) ||
+      call.doctor?.clinicName?.toLowerCase().includes(searchLower) ||
+      call.doctor?.place?.toLowerCase().includes(searchLower) ||
       call.doctor?.city?.toLowerCase().includes(searchLower) ||
+      call.doctor?.area?.toLowerCase().includes(searchLower) ||
       call.remarks?.toLowerCase().includes(searchLower);
 
     // Date filtering
@@ -96,7 +99,8 @@ const DailyCallsAdminContent = () => {
         'MR Name': call.mr?.name || 'N/A',
         'Doctor Name': `Dr. ${call.doctor?.name || 'N/A'}`,
         'Clinic Name': call.doctor?.clinicName || '-',
-        'City': call.doctor?.city || '-',
+        'Place': call.doctor?.place || call.doctor?.city || '-',
+        'Area': call.doctor?.area || '-',
         'Products': call.products && call.products.length > 0
           ? call.products.map(p => p.productName || p.name).join(', ')
           : '-',
@@ -113,7 +117,8 @@ const DailyCallsAdminContent = () => {
         { wch: 20 }, // MR Name
         { wch: 25 }, // Doctor Name
         { wch: 25 }, // Clinic Name
-        { wch: 15 }, // City
+        { wch: 15 }, // Place
+        { wch: 20 }, // Area
         { wch: 40 }, // Products
         { wch: 40 }, // Remarks
         { wch: 20 }, // Submitted On
@@ -268,17 +273,16 @@ const DailyCallsAdminContent = () => {
                   </div>
                   
                   {/* Location */}
-                  {(call.doctor?.clinicName || call.doctor?.place || call.doctor?.city) && (
+                  {(call.doctor?.clinicName || call.doctor?.place || call.doctor?.city || call.doctor?.area) && (
                     <div className="text-xs text-gray-600 mb-2">
-                      {call.doctor?.clinicName && (
-                        <div className="font-medium">{call.doctor.clinicName}</div>
-                      )}
-                      {(call.doctor?.place || call.doctor?.city) && (
-                        <div className="flex items-center text-gray-500 mt-0.5">
-                          <FiMapPin size={10} className="mr-1" />
-                          {call.doctor.place || call.doctor.city}
-                        </div>
-                      )}
+                      <div className="flex items-center text-gray-500">
+                        <FiMapPin size={10} className="mr-1" />
+                        {call.doctor?.clinicName && <span>{call.doctor.clinicName}</span>}
+                        {call.doctor?.clinicName && (call.doctor?.place || call.doctor?.city) && <span> • </span>}
+                        {(call.doctor?.place || call.doctor?.city) && <span>{call.doctor.place || call.doctor.city}</span>}
+                        {call.doctor?.area && (call.doctor?.place || call.doctor?.city) && <span> • </span>}
+                        {call.doctor?.area && <span>{call.doctor.area}</span>}
+                      </div>
                     </div>
                   )}
                   
@@ -362,16 +366,18 @@ const DailyCallsAdminContent = () => {
                     </td>
                     <td className="px-4 py-3">
                       <div className="text-xs text-gray-600">
-                        {call.doctor?.clinicName && (
-                          <div className="font-medium">{call.doctor.clinicName}</div>
-                        )}
-                        {(call.doctor?.place || call.doctor?.city) && (
-                          <div className="flex items-center text-gray-500 mt-0.5">
+                        {(call.doctor?.clinicName || call.doctor?.place || call.doctor?.city || call.doctor?.area) ? (
+                          <div className="flex items-center text-gray-500">
                             <FiMapPin size={10} className="mr-1" />
-                            {call.doctor.place || call.doctor.city}
+                            {call.doctor?.clinicName && <span>{call.doctor.clinicName}</span>}
+                            {call.doctor?.clinicName && (call.doctor?.place || call.doctor?.city) && <span> • </span>}
+                            {(call.doctor?.place || call.doctor?.city) && <span>{call.doctor.place || call.doctor.city}</span>}
+                            {call.doctor?.area && (call.doctor?.place || call.doctor?.city) && <span> • </span>}
+                            {call.doctor?.area && <span>{call.doctor.area}</span>}
                           </div>
+                        ) : (
+                          "-"
                         )}
-                        {!call.doctor?.clinicName && !call.doctor?.place && !call.doctor?.city && "-"}
                       </div>
                     </td>
                     <td className="px-4 py-3">

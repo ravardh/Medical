@@ -21,6 +21,7 @@ const getStatusBadge = (status) => {
 };
 
 const entryTotal = (entry) =>
+  (entry.fare || 0) +
   (entry.dailyAllowance?.hq || 0) +
   (entry.dailyAllowance?.ex || 0) +
   (entry.dailyAllowance?.os || 0) +
@@ -150,12 +151,13 @@ const ExpenseViewModal = ({
 
           {/* Expense entries table */}
           <div className="overflow-x-auto rounded-lg border border-gray-200 mb-3 sm:mb-4 -mx-3 sm:mx-0">
-            <div className="min-w-[860px] px-3 sm:px-0">
+            <div className="min-w-[960px] px-3 sm:px-0">
             <table className="w-full border-collapse text-xs sm:text-sm">
               <thead>
                 <tr className="bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700">
                   <th className="px-2 sm:px-3 py-2 border border-gray-200 font-semibold text-center w-12 sm:w-auto">Date</th>
                   <th className="px-2 sm:px-3 py-2 border border-gray-200 font-semibold text-left">Place</th>
+                  <th className="px-2 sm:px-3 py-2 border border-gray-200 font-semibold text-center">Fare</th>
                   <th colSpan={3} className="px-2 sm:px-3 py-2 border border-gray-200 font-semibold text-center">
                     Daily Allowance
                   </th>
@@ -164,6 +166,7 @@ const ExpenseViewModal = ({
                   <th className="px-2 sm:px-3 py-2 border border-gray-200 font-semibold text-left">Remark</th>
                 </tr>
                 <tr className="bg-gray-50 text-gray-500 text-xs">
+                  <th className="border border-gray-200" />
                   <th className="border border-gray-200" />
                   <th className="border border-gray-200" />
                   <th className="px-2 py-1 border border-gray-200 text-center font-medium">H.Q.</th>
@@ -201,37 +204,52 @@ const ExpenseViewModal = ({
                     <td className="px-1 sm:px-1.5 py-1.5 border border-gray-200">
                       <input
                         type="number"
-                        value={entry.dailyAllowance.hq}
+                        value={entry.fare || ""}
+                        onChange={(e) => onEntryChange(index, "fare", e.target.value)}
+                        disabled={!isEditing}
+                        className="w-14 sm:w-16 px-1.5 py-1 text-xs sm:text-sm text-center rounded border-0 focus:ring-2 focus:ring-blue-400 disabled:bg-transparent min-h-[32px]"
+                        min="0"
+                        placeholder="0"
+                      />
+                    </td>
+                    <td className="px-1 sm:px-1.5 py-1.5 border border-gray-200">
+                      <input
+                        type="number"
+                        value={entry.dailyAllowance.hq || ""}
                         onChange={(e) => onEntryChange(index, "dailyAllowance.hq", e.target.value)}
                         disabled={!isEditing}
                         className="w-14 sm:w-16 px-1.5 py-1 text-xs sm:text-sm text-center rounded border-0 focus:ring-2 focus:ring-blue-400 disabled:bg-transparent min-h-[32px]"
+                        placeholder="0"
                       />
                     </td>
                     <td className="px-1 sm:px-1.5 py-1.5 border border-gray-200">
                       <input
                         type="number"
-                        value={entry.dailyAllowance.ex}
+                        value={entry.dailyAllowance.ex || ""}
                         onChange={(e) => onEntryChange(index, "dailyAllowance.ex", e.target.value)}
                         disabled={!isEditing}
                         className="w-14 sm:w-16 px-1.5 py-1 text-xs sm:text-sm text-center rounded border-0 focus:ring-2 focus:ring-blue-400 disabled:bg-transparent min-h-[32px]"
+                        placeholder="0"
                       />
                     </td>
                     <td className="px-1 sm:px-1.5 py-1.5 border border-gray-200">
                       <input
                         type="number"
-                        value={entry.dailyAllowance.os}
+                        value={entry.dailyAllowance.os || ""}
                         onChange={(e) => onEntryChange(index, "dailyAllowance.os", e.target.value)}
                         disabled={!isEditing}
                         className="w-14 sm:w-16 px-1.5 py-1 text-xs sm:text-sm text-center rounded border-0 focus:ring-2 focus:ring-blue-400 disabled:bg-transparent min-h-[32px]"
+                        placeholder="0"
                       />
                     </td>
                     <td className="px-1 sm:px-1.5 py-1.5 border border-gray-200">
                       <input
                         type="number"
-                        value={entry.otherExpenses}
+                        value={entry.otherExpenses || ""}
                         onChange={(e) => onEntryChange(index, "otherExpenses", e.target.value)}
                         disabled={!isEditing}
                         className="w-14 sm:w-16 px-1.5 py-1 text-xs sm:text-sm text-center rounded border-0 focus:ring-2 focus:ring-blue-400 disabled:bg-transparent min-h-[32px]"
+                        placeholder="0"
                       />
                     </td>
                     <td className="px-2 py-1.5 border border-gray-200 text-center text-xs font-semibold whitespace-nowrap">
@@ -253,6 +271,9 @@ const ExpenseViewModal = ({
                 <tr className="bg-gradient-to-r from-gray-100 to-gray-50 font-semibold text-xs sm:text-sm">
                   <td colSpan={2} className="px-2 sm:px-3 py-2 border border-gray-200 text-right text-gray-700">
                     TOTAL
+                  </td>
+                  <td className="px-2 sm:px-3 py-2 border border-gray-200 text-center">
+                    ₹{(expense.totals?.fare ?? 0).toFixed(2)}
                   </td>
                   <td className="px-2 sm:px-3 py-2 border border-gray-200 text-center">
                     ₹{(expense.totals?.hq ?? 0).toFixed(2)}

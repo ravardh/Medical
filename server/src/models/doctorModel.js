@@ -12,10 +12,17 @@ const doctorSchema = mongoose.Schema(
     place: {
       type: String,
     },
+    area: {
+      type: String,
+    },
     birthdate: {
       type: Date,
     },
     phone: {
+      type: String,
+      default: '',
+    },
+    phone2: {
       type: String,
       default: '',
     },

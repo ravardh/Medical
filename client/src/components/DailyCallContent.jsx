@@ -341,7 +341,8 @@ const DailyCallContent = ({ isEmployee = false }) => {
                             doctor.name.toLowerCase().includes(search) ||
                             (doctor.clinicName && doctor.clinicName.toLowerCase().includes(search)) ||
                             (doctor.place && doctor.place.toLowerCase().includes(search)) ||
-                            (doctor.city && doctor.city.toLowerCase().includes(search))
+                            (doctor.city && doctor.city.toLowerCase().includes(search)) ||
+                            (doctor.area && doctor.area.toLowerCase().includes(search))
                           );
                         })
                         .map((doctor) => (
@@ -349,21 +350,25 @@ const DailyCallContent = ({ isEmployee = false }) => {
                             key={doctor._id}
                             onClick={() => {
                               const loc = doctor.place || doctor.city;
+                              const area = doctor.area;
+                              const locationStr = loc ? (area ? `${loc}, ${area}` : loc) : (area ? area : '');
                               setFormData(prev => ({
                                 ...prev,
                                 doctor: doctor._id,
-                                doctorSearch: `Dr. ${doctor.name}${doctor.clinicName ? ` - ${doctor.clinicName}` : ""}${loc ? ` (${loc})` : ""}`
+                                doctorSearch: `Dr. ${doctor.name}${doctor.clinicName ? ` - ${doctor.clinicName}` : ""}${locationStr ? ` (${locationStr})` : ""}`
                               }));
                               setShowDropdown(false);
                             }}
                             className="px-3 py-3 hover:bg-cyan-50 cursor-pointer transition-colors touch-manipulation active:bg-cyan-100"
                           >
                             <div className="font-medium text-gray-900">Dr. {doctor.name}</div>
-                            {(doctor.clinicName || doctor.place || doctor.city) && (
+                            {(doctor.clinicName || doctor.place || doctor.city || doctor.area) && (
                               <div className="text-sm text-gray-600">
                                 {doctor.clinicName && <span>{doctor.clinicName}</span>}
                                 {doctor.clinicName && (doctor.place || doctor.city) && <span> • </span>}
                                 {(doctor.place || doctor.city) && <span>{doctor.place || doctor.city}</span>}
+                                {doctor.area && (doctor.place || doctor.city) && <span> • </span>}
+                                {doctor.area && <span>{doctor.area}</span>}
                               </div>
                             )}
                           </div>
@@ -374,7 +379,8 @@ const DailyCallContent = ({ isEmployee = false }) => {
                           doctor.name.toLowerCase().includes(search) ||
                           (doctor.clinicName && doctor.clinicName.toLowerCase().includes(search)) ||
                           (doctor.place && doctor.place.toLowerCase().includes(search)) ||
-                          (doctor.city && doctor.city.toLowerCase().includes(search))
+                          (doctor.city && doctor.city.toLowerCase().includes(search)) ||
+                          (doctor.area && doctor.area.toLowerCase().includes(search))
                         );
                       }).length === 0 && (
                         <div className="px-3 py-3 text-gray-500 text-center text-sm">
