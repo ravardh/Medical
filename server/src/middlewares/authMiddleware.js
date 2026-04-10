@@ -36,6 +36,7 @@ export const verifyAdminToken = async (req, res, next) => {
       return res.status(403).json({ message: "Access denied. Admin privileges required." });
     }
 
+    console.log("✅ [Auth] Admin authenticated - User ID:", user._id, "| Name:", user.name);
     req.admin = user; // Attach full user object to request
     next();
   } catch (error) {
@@ -69,6 +70,7 @@ export const verifyMRToken = async (req, res, next) => {
       return res.status(403).json({ message: "Access denied. Employee role required." });
     }
 
+    console.log("✅ [Auth] Employee (MR) authenticated - User ID:", user._id, "| Name:", user.name);
     req.user = user; // Attach user object to request
     next();
   } catch (error) {
