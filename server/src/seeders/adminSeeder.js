@@ -8,7 +8,6 @@ dotenv.config();
 // Connect to MongoDB
 mongoose
   .connect(process.env.MONGODB_URI)
-  .then(() => console.log("Connected to MongoDB for seeding"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
 // Admin user data
@@ -31,7 +30,6 @@ async function seedAdmin() {
 
     if (existingAdmin) {
       await User.deleteMany();
-      console.log("Old admin user(s) removed");
     }
 
     // Hash the password
@@ -46,7 +44,6 @@ async function seedAdmin() {
 
     // Save admin to database
     await admin.save();
-    console.log("Admin user created successfully");
   } catch (error) {
     console.error("Error seeding admin user:", error);
   } finally {

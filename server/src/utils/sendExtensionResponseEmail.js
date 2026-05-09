@@ -497,7 +497,6 @@ const sendExtensionResponseEmail = async (
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log(`[EMAIL] Extension response email sent to ${employeeEmail}`);
     return { success: true };
   } catch (error) {
     console.error("[EMAIL ERROR] Failed to send extension response email:", error);

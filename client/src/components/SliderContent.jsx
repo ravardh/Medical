@@ -16,7 +16,6 @@ const SliderContent = () => {
   const fetchSliderImages = async () => {
     try {
       const res = await axios.get("/public/slider");
-      //console.log(res.data);
       setSliders(Array.isArray(res.data.sliders) ? res.data.sliders : []);
     } catch (error) {
       toast.error("Failed to fetch slider images");

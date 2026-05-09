@@ -8,7 +8,6 @@ import Doctor from "../models/doctorModel.js";
 const sendBirthdayReminderEmail = async (doctors) => {
   try {
     if (!doctors || doctors.length === 0) {
-      console.log("📅 No upcoming doctor birthdays");
       return;
     }
 
@@ -58,7 +57,6 @@ This is an automated reminder from MediTech Remedies System.
     };
 
     await transporter.sendMail(mailOptions);
-    console.log(`📨 Birthday reminder email sent to admin for ${doctors.length} doctor(s)`);
   } catch (error) {
     console.error("❌ Failed to send birthday reminder email:", error.message);
   }
@@ -107,10 +105,8 @@ export const checkUpcomingBirthdays = async () => {
         return dateA - dateB;
       });
 
-      console.log(`🎂 Found ${upcomingBirthdays.length} upcoming doctor birthday(s)`);
       await sendBirthdayReminderEmail(upcomingBirthdays);
     } else {
-      console.log("📅 No doctor birthdays in the next 7 days");
     }
   } catch (error) {
     console.error("❌ Error checking upcoming birthdays:", error.message);
@@ -129,7 +125,6 @@ export const scheduleBirthdayReminders = () => {
     checkUpcomingBirthdays();
   }, 7 * 24 * 60 * 60 * 1000); // 7 days in milliseconds
 
-  console.log("✅ Birthday reminder scheduler started (runs every 7 days)");
 };
 
 export default sendBirthdayReminderEmail;

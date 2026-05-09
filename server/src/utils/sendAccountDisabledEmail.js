@@ -133,7 +133,6 @@ Division of Alvin Willcure Labs Pvt Ltd.
     };
 
     await transporter.sendMail(mailOptions);
-    console.log("[EMAIL] Account disabled email sent to:", email);
     return { success: true };
   } catch (error) {
     console.error("[EMAIL ERROR] Failed to send account disabled email:", error.message);

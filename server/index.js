@@ -37,13 +37,6 @@ app.use(morgan("dev"));
 app.use((req, res, next) => {
   if (req.path.includes('/doctors')) {
     if (req.method === 'POST' || req.method === 'PUT') {
-      console.log("\n════════════════════════════════════════════════════════════");
-      console.log(`📨 [INCOMING REQUEST] ${req.method} ${req.path}`);
-      console.log("────────────────────────────────────────────────────────────");
-      console.log("Request body fields:");
-      console.log("  - area:", req.body.area !== undefined ? `"${req.body.area}"` : "(NOT SENT)");
-      console.log("  - phone2:", req.body.phone2 !== undefined ? `"${req.body.phone2}"` : "(NOT SENT)");
-      console.log("════════════════════════════════════════════════════════════\n");
     }
   }
   next();
@@ -92,22 +85,24 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT;
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  process.stdout.write(`✅ Server is running on port ${PORT}\n`);
+
   connectDB();
   
   // Test Cloudinary configuration
   try {
     const cloudinary = getCloudinary();
-    console.log("✅ Cloudinary configured successfully");
+    process.stdout.write("✅ Cloudinary configured successfully\n");
   } catch (error) {
-    console.error("❌ Cloudinary configuration error:", error.message);
+    process.stderr.write(`❌ Cloudinary configuration error: ${error.message}\n`);
   }
   
   // Start automatic cleanup of old extension requests
   scheduleCleanup();
-  console.log("✅ Automatic cleanup scheduler started (runs every 24 hours)");
+  process.stdout.write("✅ Automatic cleanup scheduler started (runs every 24 hours)\n");
 
   // Start birthday reminder scheduler
   scheduleBirthdayReminders();
+  process.stdout.write("✅ Birthday reminder scheduler started\n");
 
 });

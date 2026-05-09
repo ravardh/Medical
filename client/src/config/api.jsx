@@ -19,7 +19,6 @@ axiosInstance.interceptors.request.use(
     const token = localStorage.getItem('adminToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      //console.log("🔑 Adding Authorization header to request");
     }
     return config;
   },
@@ -51,8 +50,6 @@ axiosInstance.interceptors.response.use(
 );
 
 // Log the current API configuration for debugging
-// console.log(`🌐 API Base URL: ${getBaseURL()}`);
-// console.log(`🔧 Environment: ${import.meta.env.MODE}`);
 
 
 

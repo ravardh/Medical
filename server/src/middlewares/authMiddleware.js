@@ -3,15 +3,12 @@ import User from "../models/userModel.js";
 
 export const verifyAdminToken = async (req, res, next) => {
   // Debug: Log all cookies and headers
-  //console.log("🍪 Received cookies:", req.cookies);
-  //console.log("📋 Authorization header:", req.headers.authorization);
 
   const token =
     req.headers.authorization && req.headers.authorization.startsWith('Bearer')
       ? req.headers.authorization.split(' ')[1]
       : req.cookies.jwt;
 
-  //console.log("🔑 Extracted token:", token ? "Token exists" : "No token found");
 
   if (!token) {
     return res.status(401).json({
@@ -19,7 +16,6 @@ export const verifyAdminToken = async (req, res, next) => {
     });
   }
 
-  //console.log(token);
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -36,7 +32,6 @@ export const verifyAdminToken = async (req, res, next) => {
       return res.status(403).json({ message: "Access denied. Admin privileges required." });
     }
 
-    console.log("✅ [Auth] Admin authenticated - User ID:", user._id, "| Name:", user.name);
     req.admin = user; // Attach full user object to request
     next();
   } catch (error) {
@@ -70,7 +65,6 @@ export const verifyMRToken = async (req, res, next) => {
       return res.status(403).json({ message: "Access denied. Employee role required." });
     }
 
-    console.log("✅ [Auth] Employee (MR) authenticated - User ID:", user._id, "| Name:", user.name);
     req.user = user; // Attach user object to request
     next();
   } catch (error) {

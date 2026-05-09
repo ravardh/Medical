@@ -18,7 +18,6 @@ export const cleanupOldRequests = async () => {
       ],
     });
 
-    console.log(`[CLEANUP] Cleaned up ${result.deletedCount} old extension requests (>1 week)`);
     return result.deletedCount;
   } catch (error) {
     console.error("Error cleaning up old requests:", error);

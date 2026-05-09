@@ -6,7 +6,6 @@ export const LoginController = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    //console.log(email, password);
     // Simple validation
     if (!email || !password) {
       const err = new Error("All fields are required.");
@@ -16,7 +15,6 @@ export const LoginController = async (req, res, next) => {
 
     // Check if the user exists
     const user = await User.findOne({ email });
-    //console.log("user", user);
     if (!user) {
       const err = new Error("User not found.");
       err.status = 404;
@@ -32,7 +30,6 @@ export const LoginController = async (req, res, next) => {
 
     // Check if the password is correct
     const ispasswordCorrect = await bcrypt.compare(password, user.password);
-    //console.log("Password",ispasswordCorrect);
     if (!ispasswordCorrect) {
       const err = new Error("Invalid credentials.");
       err.status = 401;
@@ -55,7 +52,6 @@ export const LoginController = async (req, res, next) => {
       token
     });
   } catch (err) {
-    console.log(err);
     const error = new Error("Server Error");
     error.status = 500;
     return next(error);

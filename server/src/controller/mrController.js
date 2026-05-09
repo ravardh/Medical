@@ -12,9 +12,6 @@ export const addDoctor = async (req, res) => {
   try {
     const { name, clinicName, place, area, birthdate, phone, phone2, email } = req.body;
 
-    console.log("🏥 [MR addDoctor] Received data:", { name, clinicName, place, area, birthdate, phone, phone2, email });
-    console.log("🏥 [MR addDoctor] AREA field received:", area, "| PHONE2 field received:", phone2);
-    console.log("👤 [MR addDoctor] req.user:", req.user?._id);
 
     if (!name) {
       return res.status(400).json({ message: "Doctor name is required" });
@@ -32,12 +29,9 @@ export const addDoctor = async (req, res) => {
       createdBy: req.user._id, // MR's ID from JWT
     });
 
-    console.log("💾 [MR addDoctor] Doctor object created - area:", newDoctor.area, "| phone2:", newDoctor.phone2);
 
     await newDoctor.save();
     
-    console.log("✅ [MR addDoctor] Doctor saved successfully");
-    console.log("✅ [MR addDoctor] After save - area:", newDoctor.area, "| phone2:", newDoctor.phone2);
 
     res.status(201).json({
       message: "Doctor added successfully",
@@ -57,9 +51,7 @@ export const getAllDoctors = async (req, res) => {
       .sort({ createdAt: -1 })
       .select("name clinicName place area birthdate phone phone2 email createdBy");
 
-    console.log("📋 [MR getAllDoctors] Found", doctors.length, "doctors");
     doctors.forEach((doc, idx) => {
-      console.log(`  Doctor ${idx + 1}: area="${doc.area || '(missing)'}" | phone2="${doc.phone2 || '(missing)'}"`);
     });
 
     res.json(doctors);
@@ -75,9 +67,6 @@ export const updateDoctor = async (req, res) => {
     const { id } = req.params;
     const { name, clinicName, place, area, birthdate, phone, phone2, email } = req.body;
 
-    console.log("🏥 [MR updateDoctor] Received update data:", { name, clinicName, place, area, birthdate, phone, phone2, email });
-    console.log("🏥 [MR updateDoctor] AREA field received:", area, "| PHONE2 field received:", phone2);
-    console.log("🔑 [MR updateDoctor] Doctor ID:", id);
 
     // Find doctor by ID (no ownership restriction)
     const doctor = await Doctor.findById(id);
@@ -86,7 +75,6 @@ export const updateDoctor = async (req, res) => {
       return res.status(404).json({ message: "Doctor not found" });
     }
 
-    console.log("🔍 [MR updateDoctor] Before update - area:", doctor.area, "| phone2:", doctor.phone2);
 
     // Update fields - use explicit fallback values
     if (name) doctor.name = name;
@@ -98,12 +86,9 @@ export const updateDoctor = async (req, res) => {
     if (phone2 !== undefined) doctor.phone2 = phone2 || '';
     if (email !== undefined) doctor.email = email || '';
 
-    console.log("💾 [MR updateDoctor] After assignment - area:", doctor.area, "| phone2:", doctor.phone2);
 
     await doctor.save();
 
-    console.log("✅ [MR updateDoctor] Doctor saved successfully");
-    console.log("✅ [MR updateDoctor] After save - area:", doctor.area, "| phone2:", doctor.phone2);
 
     res.json({
       message: "Doctor updated successfully",
@@ -154,9 +139,6 @@ export const submitDailyCall = async (req, res) => {
     
     // Check if date is within range OR has an approved extension request
     if (selectedDate < minDate || selectedDate > today) {
-      console.log("Date outside normal range, checking for approved extension...");
-      console.log("Selected date:", selectedDate.toISOString());
-      console.log("Employee ID:", req.user._id);
       
       // Check for approved extension requests for this employee
       const approvedRequests = await TimeExtensionRequest.find({
@@ -164,23 +146,18 @@ export const submitDailyCall = async (req, res) => {
         status: "approved",
       });
       
-      console.log("Found approved requests:", approvedRequests.length);
       
       // Check if any approved request matches the selected date
       let dateMatches = false;
       for (const request of approvedRequests) {
         const requestDate = new Date(request.requestedDate);
         requestDate.setHours(0, 0, 0, 0);
-        console.log("Comparing with request date:", requestDate.toISOString(), "Status:", request.status);
-        console.log("Selected time:", selectedDate.getTime(), "Request time:", requestDate.getTime());
         if (selectedDate.getTime() === requestDate.getTime()) {
           dateMatches = true;
-          console.log("Date matches!");
           break;
         }
       }
       
-      console.log("Final dateMatches:", dateMatches);
       
       if (!dateMatches) {
         return res.status(400).json({

@@ -28,7 +28,6 @@ setInterval(() => {
   for (const [userId, otpData] of otpStore.entries()) {
     if (now > otpData.expiresAt) {
       otpStore.delete(userId);
-      console.log(`[OTP Cleanup] Removed expired OTP for user ${userId}`);
     }
   }
 
@@ -37,7 +36,6 @@ setInterval(() => {
   for (const [userId, attemptData] of resendAttempts.entries()) {
     if (attemptData.lastSentAt < oneHourAgo) {
       resendAttempts.delete(userId);
-      console.log(`[OTP Cleanup] Removed old resend attempts for user ${userId}`);
     }
   }
 }, 5 * 60 * 1000); // Run every 5 minutes
@@ -120,7 +118,6 @@ export const updateProduct = async (req, res) => {
 export const getAllProducts = async (req, res) => {
   try {
     const products = await Product.find().sort({ createdAt: -1 });
-    // console.log(products)
     res.json(products);
   } catch (error) {
     console.error("Error in getAllProducts:", error);
@@ -160,7 +157,6 @@ export const getStats = async (req, res) => {
     });
     const totalReviews = await Review.countDocuments();
     const totalUsers = await User.countDocuments({ role: { $ne: "admin" } });
-    // console.log(totalProducts, totalSlider, totalUsers, totalContacts);
     res.json({
       totalProducts,
       totalSlider,
@@ -249,7 +245,6 @@ export const deleteSliderImage = async (req, res) => {
       });
     }
 
-    console.log(slider);
 
     // Delete from Cloudinary
     if (slider.public_id) {
@@ -640,7 +635,6 @@ export const generateReenableOTP = async (req, res) => {
     }
 
     // Log for security monitoring
-    console.log(`[OTP] ${isResend ? 'Resent' : 'Generated'} for user ${id} (${user.email}). Attempt ${otpData.attemptCount}`);
 
     const maxAttemptsPerWindow = 5;
     const currentAttemptData = resendAttempts.get(id) || { attempts: [], lastSentAt: 0 };
@@ -697,7 +691,6 @@ export const verifyReenableOTP = async (req, res) => {
     resendAttempts.delete(id);
 
     // Log successful verification
-    console.log(`[OTP] Successfully verified for user ${id} (${user.email}). Account re-enabled.`);
 
     res.json({
       message: `${user.name}'s account has been re-enabled successfully`,
@@ -737,9 +730,7 @@ export const getAllDoctors = async (req, res) => {
       .populate("createdBy", "name email")
       .sort({ createdAt: -1 });
     
-    console.log("📋 [getAllDoctors] Found", doctors.length, "doctors");
     doctors.forEach((doc, idx) => {
-      console.log(`  Doctor ${idx + 1}: area="${doc.area || '(missing)'}" | phone2="${doc.phone2 || '(missing)'}"`);
     });
     
     res.json(doctors);
@@ -754,9 +745,6 @@ export const addDoctor = async (req, res) => {
   try {
     const { name, clinicName, place, area, birthdate, phone, phone2, email } = req.body;
 
-    console.log("🏥 [addDoctor] Received data:", { name, clinicName, place, area, birthdate, phone, phone2, email });
-    console.log("🏥 [addDoctor] AREA field received:", area, "| PHONE2 field received:", phone2);
-    console.log("👤 [addDoctor] req.admin:", req.admin);
 
     if (!name) {
       return res.status(400).json({ message: "Name is required" });
@@ -774,19 +762,14 @@ export const addDoctor = async (req, res) => {
       createdBy: req.admin.id, // Use admin's ID
     });
 
-    console.log("💾 [addDoctor] Doctor object created - area:", newDoctor.area, "| phone2:", newDoctor.phone2);
 
     await newDoctor.save();
-    console.log("✅ [addDoctor] Doctor saved successfully with ID:", newDoctor._id);
-    console.log("✅ [addDoctor] After save - area:", newDoctor.area, "| phone2:", newDoctor.phone2);
 
     const populatedDoctor = await Doctor.findById(newDoctor._id).populate(
       "createdBy",
       "name email"
     );
 
-    console.log("📋 [addDoctor] Final populated doctor - area:", populatedDoctor.area, "| phone2:", populatedDoctor.phone2);
-    console.log("📋 [addDoctor] Final populated doctor:", populatedDoctor);
 
     res.status(201).json(populatedDoctor);
   } catch (error) {
@@ -801,9 +784,6 @@ export const updateDoctor = async (req, res) => {
     const { id } = req.params;
     const updateData = { ...req.body };
     
-    console.log("🏥 [updateDoctor] Received update data:", updateData);
-    console.log("🏥 [updateDoctor] AREA field received:", updateData.area, "| PHONE2 field received:", updateData.phone2);
-    console.log("🔑 [updateDoctor] Doctor ID:", id);
     
     // Ensure all fields have proper fallback values
     if (typeof updateData.clinicName === 'undefined') updateData.clinicName = '';
@@ -814,13 +794,9 @@ export const updateDoctor = async (req, res) => {
     if (typeof updateData.email === 'undefined') updateData.email = '';
     if (typeof updateData.birthdate === 'undefined') updateData.birthdate = null;
     
-    console.log("🔄 [updateDoctor] After defaults - area:", updateData.area, "| phone2:", updateData.phone2);
-    console.log("🔄 [updateDoctor] Final update data:", updateData);
     
     const updatedDoctor = await Doctor.findByIdAndUpdate(id, updateData, { new: true }).populate("createdBy", "name");
     
-    console.log("✅ [updateDoctor] After save - area:", updatedDoctor?.area, "| phone2:", updatedDoctor?.phone2);
-    console.log("📋 [updateDoctor] Updated doctor:", updatedDoctor);
     
     if (!updatedDoctor) {
       return res.status(404).json({ message: "Doctor not found" });
