@@ -134,6 +134,7 @@ const ExpenseContent = () => {
         isLeave: !wasLeave,
         isHoliday: false,
         place: !wasLeave ? "Leave" : "",
+        fare: !wasLeave ? 0 : updated.entries[index].fare,
         dailyAllowance: !wasLeave ? { hq: 0, ex: 0, os: 0 } : updated.entries[index].dailyAllowance,
         otherExpenses: !wasLeave ? 0 : updated.entries[index].otherExpenses,
       };
@@ -151,6 +152,7 @@ const ExpenseContent = () => {
         isHoliday: !wasHoliday,
         isLeave: false,
         place: !wasHoliday ? "Holiday" : "",
+        fare: !wasHoliday ? 0 : updated.entries[index].fare,
         dailyAllowance: !wasHoliday ? { hq: 0, ex: 0, os: 0 } : updated.entries[index].dailyAllowance,
         otherExpenses: !wasHoliday ? 0 : updated.entries[index].otherExpenses,
       };
@@ -160,10 +162,11 @@ const ExpenseContent = () => {
   };
 
   const recalculate = (expenseData) => {
-    const totals = { hq: 0, ex: 0, os: 0, otherExpenses: 0, grandTotal: 0 };
+    const totals = { fare: 0, hq: 0, ex: 0, os: 0, otherExpenses: 0, grandTotal: 0 };
     const summary = { atHQ: 0, atExStn: 0, atOutStn: 0, leaveTaken: 0, holiday: 0, total: expenseData.entries.length };
 
     expenseData.entries.forEach((entry) => {
+      totals.fare += entry.fare || 0;
       totals.hq += entry.dailyAllowance?.hq || 0;
       totals.ex += entry.dailyAllowance?.ex || 0;
       totals.os += entry.dailyAllowance?.os || 0;
@@ -180,7 +183,7 @@ const ExpenseContent = () => {
       }
     });
 
-    totals.grandTotal = totals.hq + totals.ex + totals.os + totals.otherExpenses;
+    totals.grandTotal = totals.fare + totals.hq + totals.ex + totals.os + totals.otherExpenses;
     expenseData.totals = totals;
     expenseData.summary = summary;
   };
@@ -223,6 +226,7 @@ const ExpenseContent = () => {
   };
 
   const entryTotal = (entry) =>
+    (entry.fare || 0) +
     (entry.dailyAllowance?.hq || 0) +
     (entry.dailyAllowance?.ex || 0) +
     (entry.dailyAllowance?.os || 0) +
@@ -375,12 +379,13 @@ const ExpenseContent = () => {
         </p>
       </div>
       <div className="bg-white rounded-lg shadow-md overflow-x-auto -mx-3 sm:mx-0 mb-4 sm:mb-6">
-        <div className="min-w-[900px] px-3 sm:px-0">
+        <div className="min-w-[1000px] px-3 sm:px-0">
           <table className="w-full border-collapse">
             <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b-2 border-gray-200">
               <tr>
                 <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-semibold text-gray-700 uppercase border-r">Date</th>
                 <th className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-semibold text-gray-700 uppercase border-r w-32 sm:w-48">Place</th>
+                <th className="px-2 sm:px-3 py-2 sm:py-3 text-center text-xs font-semibold text-gray-700 uppercase border-r">Fare</th>
                 <th colSpan="3" className="px-2 sm:px-3 py-2 text-center text-xs font-semibold text-gray-700 uppercase border-r">
                   Daily Allowance
                 </th>
@@ -390,6 +395,7 @@ const ExpenseContent = () => {
                 <th className="px-2 sm:px-3 py-2 sm:py-3 text-center text-xs font-semibold text-gray-700 uppercase">Actions</th>
               </tr>
               <tr className="bg-gray-50 text-xs text-gray-600">
+                <th className="border-r"></th>
                 <th className="border-r"></th>
                 <th className="border-r"></th>
                 <th className="px-2 py-1 sm:py-2 text-center border-r font-medium">H.Q.</th>
@@ -417,44 +423,59 @@ const ExpenseContent = () => {
                       className="w-full px-2 py-1.5 text-xs sm:text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 min-h-[36px]"
                     />
                   </td>
+                  <td className="px-2 sm:px-3 py-1.5 sm:py-2 border-r">
+                    <input
+                      type="number"
+                      value={entry.fare || ""}
+                      onChange={(e) => handleEntryChange(index, "fare", e.target.value)}
+                      disabled={!canEdit || entry.isLeave || entry.isHoliday}
+                      className="w-16 sm:w-20 px-1.5 sm:px-2 py-1.5 text-xs sm:text-sm text-center border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 min-h-[36px]"
+                      min="0"
+                      placeholder="0"
+                    />
+                  </td>
                   <td className="px-1.5 sm:px-2 py-1.5 sm:py-2 border-r">
                     <input
                       type="number"
-                      value={entry.dailyAllowance?.hq ?? 0}
+                      value={entry.dailyAllowance?.hq || ""}
                       onChange={(e) => handleEntryChange(index, "dailyAllowance.hq", e.target.value)}
                       disabled={!canEdit || entry.isLeave || entry.isHoliday}
                       className="w-16 sm:w-20 px-1.5 sm:px-2 py-1.5 text-xs sm:text-sm text-center border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 min-h-[36px]"
                       min="0"
+                      placeholder="0"
                     />
                   </td>
                   <td className="px-1.5 sm:px-2 py-1.5 sm:py-2 border-r">
                     <input
                       type="number"
-                      value={entry.dailyAllowance?.ex ?? 0}
+                      value={entry.dailyAllowance?.ex || ""}
                       onChange={(e) => handleEntryChange(index, "dailyAllowance.ex", e.target.value)}
                       disabled={!canEdit || entry.isLeave || entry.isHoliday}
                       className="w-16 sm:w-20 px-1.5 sm:px-2 py-1.5 text-xs sm:text-sm text-center border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 min-h-[36px]"
                       min="0"
+                      placeholder="0"
                     />
                   </td>
                   <td className="px-1.5 sm:px-2 py-1.5 sm:py-2 border-r">
                     <input
                       type="number"
-                      value={entry.dailyAllowance?.os ?? 0}
+                      value={entry.dailyAllowance?.os || ""}
                       onChange={(e) => handleEntryChange(index, "dailyAllowance.os", e.target.value)}
                       disabled={!canEdit || entry.isLeave || entry.isHoliday}
                       className="w-16 sm:w-20 px-1.5 sm:px-2 py-1.5 text-xs sm:text-sm text-center border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 min-h-[36px]"
                       min="0"
+                      placeholder="0"
                     />
                   </td>
                   <td className="px-2 sm:px-3 py-1.5 sm:py-2 border-r">
                     <input
                       type="number"
-                      value={entry.otherExpenses ?? 0}
+                      value={entry.otherExpenses || ""}
                       onChange={(e) => handleEntryChange(index, "otherExpenses", e.target.value)}
                       disabled={!canEdit || entry.isLeave || entry.isHoliday}
                       className="w-16 sm:w-20 px-1.5 sm:px-2 py-1.5 text-xs sm:text-sm text-center border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 min-h-[36px]"
                       min="0"
+                      placeholder="0"
                     />
                   </td>
                   <td className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-center font-semibold border-r whitespace-nowrap">
@@ -493,6 +514,7 @@ const ExpenseContent = () => {
               {/* Total Row */}
               <tr className="bg-gradient-to-r from-gray-100 to-gray-50 font-bold">
                 <td colSpan="2" className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm text-right border-r">TOTAL</td>
+                <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm text-center border-r">₹{(expense.totals?.fare ?? 0).toFixed(2)}</td>
                 <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm text-center border-r">₹{(expense.totals?.hq ?? 0).toFixed(2)}</td>
                 <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm text-center border-r">₹{(expense.totals?.ex ?? 0).toFixed(2)}</td>
                 <td className="px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm text-center border-r">₹{(expense.totals?.os ?? 0).toFixed(2)}</td>

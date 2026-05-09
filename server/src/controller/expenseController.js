@@ -38,6 +38,7 @@ const calculateSummary = (entries) => {
 // Helper function to calculate totals
 const calculateTotals = (entries) => {
   const totals = {
+    fare: 0,
     hq: 0,
     ex: 0,
     os: 0,
@@ -46,13 +47,14 @@ const calculateTotals = (entries) => {
   };
 
   entries.forEach((entry) => {
+    totals.fare += entry.fare || 0;
     totals.hq += entry.dailyAllowance?.hq || 0;
     totals.ex += entry.dailyAllowance?.ex || 0;
     totals.os += entry.dailyAllowance?.os || 0;
     totals.otherExpenses += entry.otherExpenses || 0;
   });
 
-  totals.grandTotal = totals.hq + totals.ex + totals.os + totals.otherExpenses;
+  totals.grandTotal = totals.fare + totals.hq + totals.ex + totals.os + totals.otherExpenses;
 
   return totals;
 };
@@ -254,7 +256,7 @@ export const getAllExpenses = async (req, res) => {
     if (employee) filter.employee = employee;
 
     const expenses = await Expense.find(filter)
-      .sort({ year: -1, month: -1, createdAt: -1 })
+      .sort({ dateOfPosting: -1, updatedAt: -1, createdAt: -1 })
       .populate("employee", "name email employeeId")
       .populate("reviewedBy", "name");
 

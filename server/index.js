@@ -33,6 +33,22 @@ app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
 app.use(morgan("dev"));
 
+// 🔍 Logging middleware for doctor requests
+app.use((req, res, next) => {
+  if (req.path.includes('/doctors')) {
+    if (req.method === 'POST' || req.method === 'PUT') {
+      console.log("\n════════════════════════════════════════════════════════════");
+      console.log(`📨 [INCOMING REQUEST] ${req.method} ${req.path}`);
+      console.log("────────────────────────────────────────────────────────────");
+      console.log("Request body fields:");
+      console.log("  - area:", req.body.area !== undefined ? `"${req.body.area}"` : "(NOT SENT)");
+      console.log("  - phone2:", req.body.phone2 !== undefined ? `"${req.body.phone2}"` : "(NOT SENT)");
+      console.log("════════════════════════════════════════════════════════════\n");
+    }
+  }
+  next();
+});
+
 app.use("/auth", authRouter);
 
 app.use("/admin", adminRouter);

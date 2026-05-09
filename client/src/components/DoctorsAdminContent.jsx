@@ -40,6 +40,7 @@ const DoctorsAdminContent = () => {
       doctor.name.toLowerCase().includes(searchLower) ||
       (doctor.clinicName && doctor.clinicName.toLowerCase().includes(searchLower)) ||
       (doctor.place && doctor.place.toLowerCase().includes(searchLower)) ||
+      (doctor.area && doctor.area.toLowerCase().includes(searchLower)) ||
       (doctor.createdBy?.name && doctor.createdBy.name.toLowerCase().includes(searchLower))
     );
   });
@@ -61,6 +62,7 @@ const DoctorsAdminContent = () => {
         'Doctor Name': `Dr. ${doctor.name}`,
         'Clinic Name': doctor.clinicName || '-',
         'Place': doctor.place || '-',
+        'Area': doctor.area || '-',
         'Birthdate': doctor.birthdate ? formatDate(doctor.birthdate) : '-',
         'Added By': doctor.createdBy?.name || 'Admin',
         'Added On': formatDate(doctor.createdAt),
@@ -223,10 +225,10 @@ const DoctorsAdminContent = () => {
                   </div>
                 )}
 
-                {doctor.place && (
+                {(doctor.place || doctor.area) && (
                   <div className="flex items-center text-sm text-gray-600 mb-2">
                     <FiMapPin size={14} className="mr-1" />
-                    {doctor.place}
+                    {doctor.place}{doctor.area ? `, ${doctor.area}` : ''}
                   </div>
                 )}
 

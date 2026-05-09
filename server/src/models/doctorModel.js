@@ -8,14 +8,25 @@ const doctorSchema = mongoose.Schema(
     },
     clinicName: {
       type: String,
+      default: '',
     },
     place: {
       type: String,
+      default: '',
+    },
+    area: {
+      type: String,
+      default: '',
     },
     birthdate: {
       type: Date,
+      default: null,
     },
     phone: {
+      type: String,
+      default: '',
+    },
+    phone2: {
       type: String,
       default: '',
     },

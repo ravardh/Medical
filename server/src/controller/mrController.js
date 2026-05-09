@@ -10,7 +10,11 @@ import { sendLeaveApplicationEmail } from "../utils/sendLeaveEmail.js";
 // Add a new doctor
 export const addDoctor = async (req, res) => {
   try {
-    const { name, clinicName, place, birthdate } = req.body;
+    const { name, clinicName, place, area, birthdate, phone, phone2, email } = req.body;
+
+    console.log("🏥 [MR addDoctor] Received data:", { name, clinicName, place, area, birthdate, phone, phone2, email });
+    console.log("🏥 [MR addDoctor] AREA field received:", area, "| PHONE2 field received:", phone2);
+    console.log("👤 [MR addDoctor] req.user:", req.user?._id);
 
     if (!name) {
       return res.status(400).json({ message: "Doctor name is required" });
@@ -18,21 +22,30 @@ export const addDoctor = async (req, res) => {
 
     const newDoctor = new Doctor({
       name,
-      clinicName,
-      place,
+      clinicName: clinicName || '',
+      place: place || '',
+      area: area || '',
       birthdate: birthdate ? new Date(birthdate) : null,
+      phone: phone || '',
+      phone2: phone2 || '',
+      email: email || '',
       createdBy: req.user._id, // MR's ID from JWT
     });
 
+    console.log("💾 [MR addDoctor] Doctor object created - area:", newDoctor.area, "| phone2:", newDoctor.phone2);
+
     await newDoctor.save();
+    
+    console.log("✅ [MR addDoctor] Doctor saved successfully");
+    console.log("✅ [MR addDoctor] After save - area:", newDoctor.area, "| phone2:", newDoctor.phone2);
 
     res.status(201).json({
       message: "Doctor added successfully",
       doctor: newDoctor,
     });
   } catch (error) {
-    console.error("Error in addDoctor:", error);
-    res.status(500).json({ message: "Failed to add doctor" });
+    console.error("❌ [MR addDoctor] Error in addDoctor:", error);
+    res.status(500).json({ message: "Failed to add doctor", error: error.message });
   }
 };
 
@@ -42,7 +55,12 @@ export const getAllDoctors = async (req, res) => {
     const doctors = await Doctor.find()
       .populate("createdBy", "name email")
       .sort({ createdAt: -1 })
-      .select("name clinicName place birthdate createdBy");
+      .select("name clinicName place area birthdate phone phone2 email createdBy");
+
+    console.log("📋 [MR getAllDoctors] Found", doctors.length, "doctors");
+    doctors.forEach((doc, idx) => {
+      console.log(`  Doctor ${idx + 1}: area="${doc.area || '(missing)'}" | phone2="${doc.phone2 || '(missing)'}"`);
+    });
 
     res.json(doctors);
   } catch (error) {
@@ -51,34 +69,49 @@ export const getAllDoctors = async (req, res) => {
   }
 };
 
-// Update doctor
+// Update doctor - employees can edit any doctor (same rights as admin)
 export const updateDoctor = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, clinicName, place, birthdate } = req.body;
+    const { name, clinicName, place, area, birthdate, phone, phone2, email } = req.body;
 
-    // Find doctor and verify ownership
-    const doctor = await Doctor.findOne({ _id: id, createdBy: req.user._id });
+    console.log("🏥 [MR updateDoctor] Received update data:", { name, clinicName, place, area, birthdate, phone, phone2, email });
+    console.log("🏥 [MR updateDoctor] AREA field received:", area, "| PHONE2 field received:", phone2);
+    console.log("🔑 [MR updateDoctor] Doctor ID:", id);
+
+    // Find doctor by ID (no ownership restriction)
+    const doctor = await Doctor.findById(id);
 
     if (!doctor) {
-      return res.status(404).json({ message: "Doctor not found or unauthorized" });
+      return res.status(404).json({ message: "Doctor not found" });
     }
 
-    // Update fields
+    console.log("🔍 [MR updateDoctor] Before update - area:", doctor.area, "| phone2:", doctor.phone2);
+
+    // Update fields - use explicit fallback values
     if (name) doctor.name = name;
-    if (clinicName !== undefined) doctor.clinicName = clinicName;
-    if (place !== undefined) doctor.place = place;
+    if (clinicName !== undefined) doctor.clinicName = clinicName || '';
+    if (place !== undefined) doctor.place = place || '';
+    if (area !== undefined) doctor.area = area || '';
     if (birthdate !== undefined) doctor.birthdate = birthdate ? new Date(birthdate) : null;
+    if (phone !== undefined) doctor.phone = phone || '';
+    if (phone2 !== undefined) doctor.phone2 = phone2 || '';
+    if (email !== undefined) doctor.email = email || '';
+
+    console.log("💾 [MR updateDoctor] After assignment - area:", doctor.area, "| phone2:", doctor.phone2);
 
     await doctor.save();
+
+    console.log("✅ [MR updateDoctor] Doctor saved successfully");
+    console.log("✅ [MR updateDoctor] After save - area:", doctor.area, "| phone2:", doctor.phone2);
 
     res.json({
       message: "Doctor updated successfully",
       doctor,
     });
   } catch (error) {
-    console.error("Error in updateDoctor:", error);
-    res.status(500).json({ message: "Failed to update doctor" });
+    console.error("❌ [MR updateDoctor] Error in updateDoctor:", error);
+    res.status(500).json({ message: "Failed to update doctor", error: error.message });
   }
 };
 
@@ -167,7 +200,7 @@ export const submitDailyCall = async (req, res) => {
     await newDailyCall.save();
 
     // Populate doctor and products details for response
-    await newDailyCall.populate("doctor", "name clinicName place");
+    await newDailyCall.populate("doctor", "name clinicName place area");
     await newDailyCall.populate("products", "productName brandName");
 
     res.status(201).json({

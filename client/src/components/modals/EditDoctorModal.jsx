@@ -45,7 +45,11 @@ const EditDoctorModal = ({ isOpen, onClose, doctor, onSuccess, isEmployee = fals
     name: "",
     clinicName: "",
     place: "",
+    area: "",
     birthdate: "",
+    phone: "",
+    phone2: "",
+    email: "",
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -55,7 +59,11 @@ const EditDoctorModal = ({ isOpen, onClose, doctor, onSuccess, isEmployee = fals
         name: doctor.name || "",
         clinicName: doctor.clinicName || "",
         place: doctor.place || "",
+        area: doctor.area || "",
         birthdate: doctor.birthdate ? new Date(doctor.birthdate).toISOString().split('T')[0] : "",
+        phone: doctor.phone || "",
+        phone2: doctor.phone2 || "",
+        email: doctor.email || "",
       });
     }
   }, [doctor]);
@@ -73,8 +81,32 @@ const EditDoctorModal = ({ isOpen, onClose, doctor, onSuccess, isEmployee = fals
     setIsLoading(true);
 
     // Validation
+    const nameRegex = /^[A-Za-z .'-]{2,50}$/;
+    const phoneRegex = /^\+?[0-9]{7,15}$/;
+    const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,}$/;
+
     if (!formData.name) {
       toast.error("Doctor name is required");
+      setIsLoading(false);
+      return;
+    }
+    if (formData.name && !nameRegex.test(formData.name)) {
+      toast.error("Enter a valid name (letters, spaces, . ' -)");
+      setIsLoading(false);
+      return;
+    }
+    if (formData.phone && !phoneRegex.test(formData.phone)) {
+      toast.error("Enter a valid phone number 1 (7-15 digits, optional +)");
+      setIsLoading(false);
+      return;
+    }
+    if (formData.phone2 && !phoneRegex.test(formData.phone2)) {
+      toast.error("Enter a valid phone number 2 (7-15 digits, optional +)");
+      setIsLoading(false);
+      return;
+    }
+    if (formData.email && !emailRegex.test(formData.email)) {
+      toast.error("Enter a valid email address");
       setIsLoading(false);
       return;
     }
@@ -171,6 +203,21 @@ const EditDoctorModal = ({ isOpen, onClose, doctor, onSuccess, isEmployee = fals
               />
             </div>
 
+            {/* Area */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Area
+              </label>
+              <input
+                type="text"
+                name="area"
+                value={formData.area}
+                onChange={handleInputChange}
+                className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                placeholder="Enter area/locality"
+              />
+            </div>
+
             {/* Birthdate */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -182,6 +229,51 @@ const EditDoctorModal = ({ isOpen, onClose, doctor, onSuccess, isEmployee = fals
                 value={formData.birthdate}
                 onChange={handleInputChange}
                 className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              />
+            </div>
+
+            {/* Phone No. 1 (optional) */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Phone No. 1 (Optional)
+              </label>
+              <input
+                type="text"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+                className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                placeholder="Enter phone number 1"
+              />
+            </div>
+
+            {/* Phone No. 2 (optional) */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Phone No. 2 (Optional)
+              </label>
+              <input
+                type="text"
+                name="phone2"
+                value={formData.phone2}
+                onChange={handleInputChange}
+                className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                placeholder="Enter phone number 2"
+              />
+            </div>
+
+            {/* Email (optional) */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email ID (Optional)
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                placeholder="Enter email address"
               />
             </div>
           </div>

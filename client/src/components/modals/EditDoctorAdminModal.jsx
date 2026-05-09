@@ -12,7 +12,11 @@ const EditDoctorAdminModal = ({ isOpen, onClose, onSuccess, doctor }) => {
     name: doctor?.name || "",
     clinicName: doctor?.clinicName || "",
     place: doctor?.place || "",
+    area: doctor?.area || "",
     birthdate: doctor?.birthdate ? doctor.birthdate.slice(0, 10) : "",
+    phone: doctor?.phone || "",
+    phone2: doctor?.phone2 || "",
+    email: doctor?.email || "",
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -42,7 +46,12 @@ const EditDoctorAdminModal = ({ isOpen, onClose, onSuccess, doctor }) => {
       return;
     }
     if (formData.phone && !phoneRegex.test(formData.phone)) {
-      toast.error("Enter a valid phone number (7-15 digits, optional +)");
+      toast.error("Enter a valid phone number 1 (7-15 digits, optional +)");
+      setIsLoading(false);
+      return;
+    }
+    if (formData.phone2 && !phoneRegex.test(formData.phone2)) {
+      toast.error("Enter a valid phone number 2 (7-15 digits, optional +)");
       setIsLoading(false);
       return;
     }
@@ -136,6 +145,22 @@ const EditDoctorAdminModal = ({ isOpen, onClose, onSuccess, doctor }) => {
                 placeholder="Or type custom place name"
               />
             </div>
+
+            {/* Area */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Area
+              </label>
+              <input
+                type="text"
+                name="area"
+                value={formData.area}
+                onChange={handleInputChange}
+                className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                placeholder="Enter area/locality"
+              />
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Birthdate (Optional)
@@ -148,10 +173,10 @@ const EditDoctorAdminModal = ({ isOpen, onClose, onSuccess, doctor }) => {
                 className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"
               />
             </div>
-            {/* Phone (optional) */}
+            {/* Phone No. 1 (optional) */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Phone Number (Optional)
+                Phone No. 1 (Optional)
               </label>
               <input
                 type="text"
@@ -159,7 +184,21 @@ const EditDoctorAdminModal = ({ isOpen, onClose, onSuccess, doctor }) => {
                 value={formData.phone}
                 onChange={handleInputChange}
                 className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                placeholder="Enter phone number"
+                placeholder="Enter phone number 1"
+              />
+            </div>
+            {/* Phone No. 2 (optional) */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Phone No. 2 (Optional)
+              </label>
+              <input
+                type="text"
+                name="phone2"
+                value={formData.phone2}
+                onChange={handleInputChange}
+                className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                placeholder="Enter phone number 2"
               />
             </div>
             {/* Email (optional) */}
